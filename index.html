@@ -1,0 +1,907 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Work Hours & Payment Analytics Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/date-fns@2.29.3/index.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 30px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+        
+        .header h1 {
+            color: #2c3e50;
+            font-size: 3rem;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+        
+        .header p {
+            color: #7f8c8d;
+            font-size: 1.2rem;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+        
+        .stat-card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            text-align: center;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+        }
+        
+        .stat-icon {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        
+        .stat-label {
+            color: #7f8c8d;
+            font-size: 1.1rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .charts-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+        
+        .chart-container {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .chart-title {
+            text-align: center;
+            color: #2c3e50;
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+        
+        .data-table {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            overflow: hidden;
+        }
+        
+        .table-title {
+            text-align: center;
+            color: #2c3e50;
+            font-size: 1.8rem;
+            font-weight: 600;
+            margin-bottom: 25px;
+        }
+        
+        .table-controls {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+        }
+        
+        .table-control-btn {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .table-control-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+        }
+        
+        .table-control-btn.active {
+            background: linear-gradient(45deg, #27ae60, #2ecc71);
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        
+        th, td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid #ecf0f1;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+        
+        th {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            position: sticky;
+            top: 0;
+        }
+        
+        tr:hover {
+            transform: scale(1.02);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        
+        .amount {
+            font-weight: 600;
+            color: #27ae60;
+        }
+        
+        .pending {
+            color: #e74c3c;
+        }
+        
+        .heatmap-cell {
+            position: relative;
+            font-weight: 600;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+        
+        .heatmap-cell:hover {
+            transform: scale(1.1);
+            z-index: 10;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+        
+        .cell-tooltip {
+            position: absolute;
+            background: rgba(0, 0, 0, 0.9);
+            color: white;
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            pointer-events: none;
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            top: -60px;
+            left: 50%;
+            transform: translateX(-50%);
+            white-space: nowrap;
+        }
+        
+        .cell-tooltip::after {
+            content: '';
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            border: 5px solid transparent;
+            border-top-color: rgba(0, 0, 0, 0.9);
+        }
+        
+        .heatmap-legend {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+            margin-top: 20px;
+            padding: 15px;
+            background: rgba(102, 126, 234, 0.1);
+            border-radius: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.9rem;
+        }
+        
+        .legend-color {
+            width: 20px;
+            height: 20px;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+        }
+        
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+        
+        .control-btn {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .control-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+        
+        .control-btn.active {
+            background: linear-gradient(45deg, #27ae60, #2ecc71);
+        }
+        
+        .insights {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            margin-top: 30px;
+        }
+        
+        .insight-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: rgba(102, 126, 234, 0.1);
+            border-radius: 10px;
+            border-left: 4px solid #667eea;
+        }
+        
+        .insight-icon {
+            font-size: 1.5rem;
+            margin-right: 15px;
+            color: #667eea;
+        }
+        
+        @media (max-width: 768px) {
+            .charts-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .controls {
+                flex-direction: column;
+                align-items: center;
+            }
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #ecf0f1;
+            border-radius: 4px;
+            margin-top: 10px;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            border-radius: 4px;
+            transition: width 0.5s ease;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1><i class="fas fa-chart-line"></i> Work Analytics Dashboard</h1>
+            <p>Comprehensive overview of work hours, earnings, and payment tracking</p>
+        </div>
+        
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon"><i class="fas fa-clock"></i></div>
+                <div class="stat-value" id="totalHours">0</div>
+                <div class="stat-label">Total Hours</div>
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: 100%"></div>
+                </div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-icon"><i class="fas fa-dollar-sign"></i></div>
+                <div class="stat-value" id="totalAmount">$0</div>
+                <div class="stat-label">Total Earnings</div>
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: 95%"></div>
+                </div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-icon"><i class="fas fa-credit-card"></i></div>
+                <div class="stat-value" id="amountReceived">$0</div>
+                <div class="stat-label">Amount Received</div>
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: 88%"></div>
+                </div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-icon"><i class="fas fa-hourglass-half"></i></div>
+                <div class="stat-value" id="pendingAmount">$0</div>
+                <div class="stat-label">Pending Amount</div>
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: 12%"></div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="controls">
+            <button class="control-btn active" onclick="showChart('hours')">Hours Overview</button>
+            <button class="control-btn" onclick="showChart('earnings')">Earnings Analysis</button>
+            <button class="control-btn" onclick="showChart('comparison')">Payment vs Earnings</button>
+            <button class="control-btn" onclick="showChart('trends')">Monthly Trends</button>
+        </div>
+        
+        <div class="charts-grid">
+            <div class="chart-container">
+                <h3 class="chart-title">Monthly Work Hours</h3>
+                <canvas id="hoursChart"></canvas>
+            </div>
+            
+            <div class="chart-container">
+                <h3 class="chart-title">Payment Analysis</h3>
+                <canvas id="paymentChart"></canvas>
+            </div>
+        </div>
+        
+        <div class="data-table">
+            <h3 class="table-title">
+                <i class="fas fa-fire"></i> Interactive Heatmap Table
+            </h3>
+            
+            <div class="table-controls">
+                <button class="table-control-btn active" onclick="updateTableHeatmap('none')">No Heatmap</button>
+                <button class="table-control-btn" onclick="updateTableHeatmap('hours')">Hours Heatmap</button>
+                <button class="table-control-btn" onclick="updateTableHeatmap('earned')">Earnings Heatmap</button>
+                <button class="table-control-btn" onclick="updateTableHeatmap('received')">Payments Heatmap</button>
+            </div>
+            
+            <table id="dataTable">
+                <thead>
+                    <tr>
+                        <th>Month</th>
+                        <th>Hours Worked</th>
+                        <th>Amount Earned</th>
+                        <th>Amount Received</th>
+                        <th>Status</th>
+                        <th>Balance</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody">
+                </tbody>
+            </table>
+            
+            <div class="heatmap-legend" id="heatmapLegend" style="display: none;">
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #ffcccb;"></div>
+                    <span>Low</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #ffd4a3;"></div>
+                    <span>Below Average</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #ffffcc;"></div>
+                    <span>Average</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #d4edda;"></div>
+                    <span>Above Average</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #c3e6cb;"></div>
+                    <span>High</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="insights">
+            <h3 class="table-title">Key Insights</h3>
+            <div class="insight-item">
+                <i class="fas fa-chart-line insight-icon"></i>
+                <div>
+                    <strong>Peak Performance:</strong> <span id="peakMonth">Loading...</span> was your most productive month with the highest hours worked.
+                </div>
+            </div>
+            <div class="insight-item">
+                <i class="fas fa-dollar-sign insight-icon"></i>
+                <div>
+                    <strong>Payment Efficiency:</strong> <span id="paymentRate">Loading...</span>% of total earnings have been received to date.
+                </div>
+            </div>
+            <div class="insight-item">
+                <i class="fas fa-calendar-alt insight-icon"></i>
+                <div>
+                    <strong>Average Monthly Hours:</strong> <span id="avgHours">Loading...</span> hours per month based on your work pattern.
+                </div>
+            </div>
+            <div class="insight-item">
+                <i class="fas fa-trend-up insight-icon"></i>
+                <div>
+                    <strong>Earning Potential:</strong> Based on current rates, your estimated monthly earning capacity is <span id="earningPotential">$0</span>.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Data from Excel file
+        const workData = [
+            {month: 'March 2024', hours: 142.25, amount: 3556.25, received: 0, notes: 'Amount to be received: $14,698.67'},
+            {month: 'April 2024', hours: 192.58, amount: 4814.5, received: 1000, notes: ''},
+            {month: 'May 2024', hours: 213.67, amount: 5341.67, received: 1200, notes: ''},
+            {month: 'June 2024', hours: 224.50, amount: 5612.5, received: 6170, notes: ''},
+            {month: 'July 2024', hours: 176.0, amount: 4400.0, received: 2000, notes: 'Previous Amount to be received before April= 13,098.67'},
+            {month: 'August 2024', hours: 231.0, amount: 5775.0, received: 3500, notes: 'Amount received in April= 5,000 + 11,000= 16,000'},
+            {month: 'September 2024', hours: 202.75, amount: 5068.75, received: 2700, notes: 'Total hours April 1-15= 140'},
+            {month: 'October 2024', hours: 178.25, amount: 4456.25, received: 14775, notes: 'Total amount April 1-15= 140x25= 3,500'},
+            {month: 'November 2024', hours: 176.25, amount: 4406.25, received: 2000, notes: ''},
+            {month: 'December 2024', hours: 222.0, amount: 5550.0, received: 500, notes: 'Total amount to be received till April= (13,098.67 + 3,500)- 16,000 = 598.67'},
+            {month: 'January 2025', hours: 249.5, amount: 6237.5, received: 1400, notes: ''},
+            {month: 'February 2025', hours: 222.75, amount: 5568.75, received: 16750, notes: ''},
+            {month: 'March 2025', hours: 236.25, amount: 5906.25, received: 1600, notes: ''},
+            {month: 'April 2025', hours: 140.0, amount: 3500.0, received: 16000, notes: ''},
+            {month: 'May 2025', hours: 0.0, amount: 0.0, received: 6000, notes: ''},
+            {month: 'June 2025', hours: 226.0, amount: 6102.0, received: 4000, notes: ''},
+            {month: 'July 2025', hours: 206.75, amount: 5582.25, received: 3150, notes: ''},
+            {month: 'August 2025', hours: 202.75, amount: 5474.25, received: 4240, notes: ''}
+        ];
+
+        // Calculate totals
+        const totalHours = workData.reduce((sum, item) => sum + item.hours, 0);
+        const totalAmount = workData.reduce((sum, item) => sum + item.amount, 0);
+        const totalReceived = workData.reduce((sum, item) => sum + item.received, 0);
+        const pendingAmount = totalAmount - totalReceived;
+
+        // Update summary statistics
+        function updateStats() {
+            document.getElementById('totalHours').textContent = totalHours.toFixed(1);
+            document.getElementById('totalAmount').textContent = '$' + totalAmount.toLocaleString();
+            document.getElementById('amountReceived').textContent = '$' + totalReceived.toLocaleString();
+            document.getElementById('pendingAmount').textContent = '$' + pendingAmount.toLocaleString();
+        }
+
+        // Create charts
+        let hoursChart, paymentChart;
+        
+        function initCharts() {
+            const months = workData.map(item => item.month.split(' ')[0]);
+            
+            // Hours Chart
+            const hoursCtx = document.getElementById('hoursChart').getContext('2d');
+            hoursChart = new Chart(hoursCtx, {
+                type: 'line',
+                data: {
+                    labels: months,
+                    datasets: [{
+                        label: 'Hours Worked',
+                        data: workData.map(item => item.hours),
+                        borderColor: '#667eea',
+                        backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                        borderWidth: 3,
+                        fill: true,
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: {
+                                color: 'rgba(0,0,0,0.1)'
+                            }
+                        },
+                        x: {
+                            grid: {
+                                color: 'rgba(0,0,0,0.1)'
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Payment Chart
+            const paymentCtx = document.getElementById('paymentChart').getContext('2d');
+            paymentChart = new Chart(paymentCtx, {
+                type: 'bar',
+                data: {
+                    labels: months,
+                    datasets: [
+                        {
+                            label: 'Amount Earned',
+                            data: workData.map(item => item.amount),
+                            backgroundColor: 'rgba(102, 126, 234, 0.8)',
+                            borderColor: '#667eea',
+                            borderWidth: 1
+                        },
+                        {
+                            label: 'Amount Received',
+                            data: workData.map(item => item.received),
+                            backgroundColor: 'rgba(39, 174, 96, 0.8)',
+                            borderColor: '#27ae60',
+                            borderWidth: 1
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'top'
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: {
+                                color: 'rgba(0,0,0,0.1)'
+                            }
+                        },
+                        x: {
+                            grid: {
+                                color: 'rgba(0,0,0,0.1)'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Populate data table
+        function populateTable() {
+            const tableBody = document.getElementById('tableBody');
+            tableBody.innerHTML = '';
+            
+            workData.forEach(item => {
+                const row = tableBody.insertRow();
+                const balance = item.amount - item.received;
+                const status = balance > 100 ? 'Pending' : balance < -100 ? 'Overpaid' : 'Balanced';
+                const statusClass = balance > 100 ? 'pending' : balance < -100 ? 'amount' : '';
+                
+                row.innerHTML = `
+                    <td>${item.month}</td>
+                    <td class="hours-cell">${item.hours.toFixed(1)}</td>
+                    <td class="earned-cell amount">$${item.amount.toLocaleString()}</td>
+                    <td class="received-cell amount">$${item.received.toLocaleString()}</td>
+                    <td class="${statusClass}">${status}</td>
+                    <td class="${statusClass}">$${balance.toLocaleString()}</td>
+                `;
+            });
+        }
+
+        // Table heatmap functionality
+        let currentTableHeatmap = 'none';
+
+        function updateTableHeatmap(type) {
+            currentTableHeatmap = type;
+            
+            // Update button states
+            document.querySelectorAll('.table-control-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            // Show/hide legend
+            const legend = document.getElementById('heatmapLegend');
+            if (type === 'none') {
+                legend.style.display = 'none';
+                clearTableHeatmap();
+            } else {
+                legend.style.display = 'flex';
+                applyTableHeatmap(type);
+            }
+        }
+
+        function clearTableHeatmap() {
+            // Remove heatmap styling from all cells
+            document.querySelectorAll('.hours-cell, .earned-cell, .received-cell').forEach(cell => {
+                cell.style.backgroundColor = '';
+                cell.style.color = '';
+                cell.classList.remove('heatmap-cell');
+                // Remove existing tooltips
+                const tooltip = cell.querySelector('.cell-tooltip');
+                if (tooltip) tooltip.remove();
+            });
+        }
+
+        function applyTableHeatmap(type) {
+            let cells, values, formatter;
+            
+            // Get appropriate cells and values based on type
+            switch(type) {
+                case 'hours':
+                    cells = document.querySelectorAll('.hours-cell');
+                    values = workData.map(item => item.hours);
+                    formatter = (val) => `${val.toFixed(1)} hours`;
+                    break;
+                case 'earned':
+                    cells = document.querySelectorAll('.earned-cell');
+                    values = workData.map(item => item.amount);
+                    formatter = (val) => `$${val.toLocaleString()}`;
+                    break;
+                case 'received':
+                    cells = document.querySelectorAll('.received-cell');
+                    values = workData.map(item => item.received);
+                    formatter = (val) => `$${val.toLocaleString()}`;
+                    break;
+            }
+            
+            // Filter out zero values for better visualization
+            const validValues = values.filter(v => v > 0);
+            const minVal = Math.min(...validValues);
+            const maxVal = Math.max(...validValues);
+            const range = maxVal - minVal;
+            
+            // Apply heatmap to cells
+            cells.forEach((cell, index) => {
+                const value = values[index];
+                
+                // Skip zero values
+                if (value === 0) {
+                    return;
+                }
+                
+                const normalized = range > 0 ? (value - minVal) / range : 0;
+                
+                // Color intensity based on normalized value - Soft Red (low) to Soft Green (high)
+                const intensity = normalized;
+                let backgroundColor, textColor;
+                
+                if (intensity <= 0.5) {
+                    // Soft Red to Soft Yellow (0 to 0.5)
+                    const localIntensity = intensity * 2; // Map 0-0.5 to 0-1
+                    const red = Math.round(220 + (35 * (1 - localIntensity))); // 220 to 255
+                    const green = Math.round(150 + (105 * localIntensity)); // 150 to 255
+                    const blue = Math.round(150 + (55 * localIntensity)); // 150 to 205
+                    backgroundColor = `rgb(${red}, ${green}, ${blue})`;
+                } else {
+                    // Soft Yellow to Soft Green (0.5 to 1)
+                    const localIntensity = (intensity - 0.5) * 2; // Map 0.5-1 to 0-1
+                    const red = Math.round(255 - (85 * localIntensity)); // 255 to 170
+                    const green = Math.round(255 - (25 * localIntensity)); // 255 to 230
+                    const blue = Math.round(205 - (35 * localIntensity)); // 205 to 170
+                    backgroundColor = `rgb(${red}, ${green}, ${blue})`;
+                }
+                
+                textColor = intensity > 0.7 ? '#333' : '#333';
+                
+                // Apply styling
+                cell.style.backgroundColor = backgroundColor;
+                cell.style.color = textColor;
+                cell.classList.add('heatmap-cell');
+                
+                // Add tooltip
+                addCellTooltip(cell, workData[index], value, type, formatter);
+            });
+        }
+
+        function addCellTooltip(cell, item, value, type, formatter) {
+            // Remove existing tooltip
+            const existingTooltip = cell.querySelector('.cell-tooltip');
+            if (existingTooltip) existingTooltip.remove();
+            
+            // Create tooltip element
+            const tooltip = document.createElement('div');
+            tooltip.className = 'cell-tooltip';
+            
+            let content = `<strong>${item.month}</strong><br>${formatter(value)}`;
+            
+            // Add contextual information
+            switch(type) {
+                case 'hours':
+                    content += `<br>Rate: $${(item.amount/item.hours).toFixed(2)}/hr`;
+                    break;
+                case 'earned':
+                    content += `<br>Hours: ${item.hours.toFixed(1)}`;
+                    break;
+                case 'received':
+                    content += `<br>Earned: $${item.amount.toLocaleString()}`;
+                    break;
+            }
+            
+            tooltip.innerHTML = content;
+            cell.appendChild(tooltip);
+            
+            // Show/hide tooltip on hover
+            cell.addEventListener('mouseenter', () => {
+                tooltip.style.opacity = '1';
+            });
+            
+            cell.addEventListener('mouseleave', () => {
+                tooltip.style.opacity = '0';
+            });
+        }
+
+        // Calculate insights
+        function calculateInsights() {
+            const validData = workData.filter(item => item.hours > 0);
+            const peakMonth = validData.reduce((max, item) => item.hours > max.hours ? item : max, validData[0]);
+            const avgHours = validData.reduce((sum, item) => sum + item.hours, 0) / validData.length;
+            const paymentRate = (totalReceived / totalAmount * 100).toFixed(1);
+            const avgHourlyRate = totalAmount / totalHours;
+            const earningPotential = (avgHours * avgHourlyRate).toFixed(0);
+            
+            document.getElementById('peakMonth').textContent = peakMonth.month;
+            document.getElementById('paymentRate').textContent = paymentRate;
+            document.getElementById('avgHours').textContent = avgHours.toFixed(1);
+            document.getElementById('earningPotential').textContent = '$' + Number(earningPotential).toLocaleString();
+        }
+
+        // Chart switching functionality
+        function showChart(type) {
+            // Remove active class from all buttons
+            document.querySelectorAll('.control-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            const months = workData.map(item => item.month.split(' ')[0]);
+            
+            switch(type) {
+                case 'hours':
+                    updateChart(hoursChart, [{
+                        label: 'Hours Worked',
+                        data: workData.map(item => item.hours),
+                        borderColor: '#667eea',
+                        backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                        borderWidth: 3,
+                        fill: true,
+                        tension: 0.4
+                    }], 'line');
+                    break;
+                case 'earnings':
+                    updateChart(hoursChart, [{
+                        label: 'Monthly Earnings',
+                        data: workData.map(item => item.amount),
+                        borderColor: '#27ae60',
+                        backgroundColor: 'rgba(39, 174, 96, 0.1)',
+                        borderWidth: 3,
+                        fill: true,
+                        tension: 0.4
+                    }], 'line');
+                    break;
+                case 'comparison':
+                    updateChart(hoursChart, [
+                        {
+                            label: 'Amount Earned',
+                            data: workData.map(item => item.amount),
+                            backgroundColor: 'rgba(102, 126, 234, 0.8)'
+                        },
+                        {
+                            label: 'Amount Received',
+                            data: workData.map(item => item.received),
+                            backgroundColor: 'rgba(39, 174, 96, 0.8)'
+                        }
+                    ], 'bar');
+                    break;
+                case 'trends':
+                    const cumulativeEarned = [];
+                    const cumulativeReceived = [];
+                    let earnedSum = 0, receivedSum = 0;
+                    
+                    workData.forEach(item => {
+                        earnedSum += item.amount;
+                        receivedSum += item.received;
+                        cumulativeEarned.push(earnedSum);
+                        cumulativeReceived.push(receivedSum);
+                    });
+                    
+                    updateChart(hoursChart, [
+                        {
+                            label: 'Cumulative Earned',
+                            data: cumulativeEarned,
+                            borderColor: '#667eea',
+                            backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                            borderWidth: 3,
+                            fill: false
+                        },
+                        {
+                            label: 'Cumulative Received',
+                            data: cumulativeReceived,
+                            borderColor: '#27ae60',
+                            backgroundColor: 'rgba(39, 174, 96, 0.1)',
+                            borderWidth: 3,
+                            fill: false
+                        }
+                    ], 'line');
+                    break;
+            }
+        }
+
+        function updateChart(chart, datasets, type) {
+            chart.config.type = type;
+            chart.data.datasets = datasets;
+            chart.update();
+        }
+
+        // Initialize everything
+        window.addEventListener('load', function() {
+            updateStats();
+            initCharts();
+            populateTable();
+            calculateInsights();
+        });
+    </script>
+</body>
+</html>
