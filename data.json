@@ -1,116 +1,142 @@
 [
   {
-    "MONTH (from 2024)":"March",
-    "TOTAL HOURS":142.25,
-    "TOTAL AMOUNT":3556.25,
-    "AMOUNT RECEIVED":"-"
+    "month": "March 2024",
+    "hours": 142.25,
+    "amount": 3556.25,
+    "received": 0,
+    "notes": "Amount to be received: $14,698.67"
   },
   {
-    "MONTH (from 2024)":"April",
-    "TOTAL HOURS":192.58,
-    "TOTAL AMOUNT":4814.5,
-    "AMOUNT RECEIVED":1000
+    "month": "April 2024",
+    "hours": 192.58,
+    "amount": 4814.5,
+    "received": 1000,
+    "notes": ""
   },
   {
-    "MONTH (from 2024)":"May",
-    "TOTAL HOURS":213.67,
-    "TOTAL AMOUNT":5341.67,
-    "AMOUNT RECEIVED":1200
+    "month": "May 2024",
+    "hours": 213.67,
+    "amount": 5341.67,
+    "received": 1200,
+    "notes": ""
   },
   {
-    "MONTH (from 2024)":"June",
-    "TOTAL HOURS":224.5,
-    "TOTAL AMOUNT":5612.5,
-    "AMOUNT RECEIVED":6170
+    "month": "June 2024",
+    "hours": 224.5,
+    "amount": 5612.5,
+    "received": 6170,
+    "notes": ""
   },
   {
-    "MONTH (from 2024)":"July",
-    "TOTAL HOURS":176.0,
-    "TOTAL AMOUNT":4400.0,
-    "AMOUNT RECEIVED":2000
+    "month": "July 2024",
+    "hours": 176.0,
+    "amount": 4400.0,
+    "received": 2000,
+    "notes": "Previous Amount to be received before April= 13,098.67"
   },
   {
-    "MONTH (from 2024)":"August",
-    "TOTAL HOURS":231.0,
-    "TOTAL AMOUNT":5775.0,
-    "AMOUNT RECEIVED":3500
+    "month": "August 2024",
+    "hours": 231.0,
+    "amount": 5775.0,
+    "received": 3500,
+    "notes": "Amount received in April= 5,000 + 11,000= 16,000"
   },
   {
-    "MONTH (from 2024)":"September",
-    "TOTAL HOURS":202.75,
-    "TOTAL AMOUNT":5068.75,
-    "AMOUNT RECEIVED":2700
+    "month": "September 2024",
+    "hours": 202.75,
+    "amount": 5068.75,
+    "received": 2700,
+    "notes": "Total hours April 1-15= 140"
   },
   {
-    "MONTH (from 2024)":"October",
-    "TOTAL HOURS":178.25,
-    "TOTAL AMOUNT":4456.25,
-    "AMOUNT RECEIVED":14775
+    "month": "October 2024",
+    "hours": 178.25,
+    "amount": 4456.25,
+    "received": 14775,
+    "notes": "Total amount April 1-15= 140x25= 3,500"
   },
   {
-    "MONTH (from 2024)":"November",
-    "TOTAL HOURS":176.25,
-    "TOTAL AMOUNT":4406.25,
-    "AMOUNT RECEIVED":2000
+    "month": "November 2024",
+    "hours": 176.25,
+    "amount": 4406.25,
+    "received": 2000,
+    "notes": ""
   },
   {
-    "MONTH (from 2024)":"December",
-    "TOTAL HOURS":222.0,
-    "TOTAL AMOUNT":5550.0,
-    "AMOUNT RECEIVED":500
+    "month": "December 2024",
+    "hours": 222.0,
+    "amount": 5550.0,
+    "received": 500,
+    "notes": "Total amount to be received till April= (13,098.67 + 3,500)- 16,000 = 598.67"
   },
   {
-    "MONTH (from 2024)":"January ",
-    "TOTAL HOURS":249.5,
-    "TOTAL AMOUNT":6237.5,
-    "AMOUNT RECEIVED":1400
+    "month": "January 2025",
+    "hours": 249.5,
+    "amount": 6237.5,
+    "received": 1400,
+    "notes": ""
   },
   {
-    "MONTH (from 2024)":"February ",
-    "TOTAL HOURS":222.75,
-    "TOTAL AMOUNT":5568.75,
-    "AMOUNT RECEIVED":16750
+    "month": "February 2025",
+    "hours": 222.75,
+    "amount": 5568.75,
+    "received": 16750,
+    "notes": ""
   },
   {
-    "MONTH (from 2024)":"March",
-    "TOTAL HOURS":236.25,
-    "TOTAL AMOUNT":5906.25,
-    "AMOUNT RECEIVED":1600
+    "month": "March 2025",
+    "hours": 236.25,
+    "amount": 5906.25,
+    "received": 1600,
+    "notes": ""
   },
   {
-    "MONTH (from 2024)":"April",
-    "TOTAL HOURS":140.0,
-    "TOTAL AMOUNT":3500.0,
-    "AMOUNT RECEIVED":16000
+    "month": "April 2025",
+    "hours": 140.0,
+    "amount": 3500.0,
+    "received": 16000,
+    "notes": ""
   },
   {
-    "MONTH (from 2024)":"May",
-    "TOTAL HOURS":0.0,
-    "TOTAL AMOUNT":0.0,
-    "AMOUNT RECEIVED":6000
+    "month": "May 2025",
+    "hours": 0.0,
+    "amount": 0.0,
+    "received": 6000,
+    "notes": ""
   },
   {
-    "MONTH (from 2024)":"June",
-    "TOTAL HOURS":226.0,
-    "TOTAL AMOUNT":6102.0,
-    "AMOUNT RECEIVED":4000
+    "month": "June 2025",
+    "hours": 226.0,
+    "amount": 6102.0,
+    "received": 4000,
+    "notes": ""
   },
   {
-    "MONTH (from 2024)":"July",
-    "TOTAL HOURS":206.75,
-    "TOTAL AMOUNT":5582.25,
-    "AMOUNT RECEIVED":3150
+    "month": "July 2025",
+    "hours": 206.75,
+    "amount": 5582.25,
+    "received": 3150,
+    "notes": ""
   },
   {
-    "MONTH (from 2024)":"August",
-    "TOTAL HOURS":202.75,
-    "TOTAL AMOUNT":5474.25,
-    "AMOUNT RECEIVED":4240
+    "month": "August 2025",
+    "hours": 202.75,
+    "amount": 5474.25,
+    "received": 4240,
+    "notes": ""
   },
   {
-    "MONTH (from 2024)":"TOTAL",
-    "TOTAL HOURS":3443.25,
-    "TOTAL AMOUNT":87352.17,
-    "AMOUNT RECEIVED":86985
+    "month": "September 2025",
+    "hours": 0,
+    "amount": 6169.5,
+    "received": 0,
+    "notes": "Data extracted from 2025 Sept 1-30.docx"
+  },
+  {
+    "month": "October 2025",
+    "hours": 0,
+    "amount": 6264.0,
+    "received": 0,
+    "notes": "Data extracted from 2025 Oct 1-31.docx"
   }
 ]
